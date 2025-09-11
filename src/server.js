@@ -10,19 +10,14 @@ const authRoutes = require('./routes/authRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Database connection
+// Database connection - Always use MongoDB for simplicity
 const connectDB = async () => {
   try {
-    if (process.env.NODE_ENV === 'production' && process.env.MONGODB_URI) {
-      await mongoose.connect(process.env.MONGODB_URI);
-      console.log('✅ MongoDB connected successfully');
-    } else {
-      console.log('✅ Using JSON file storage for development');
-    }
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('✅ MongoDB connected successfully');
   } catch (error) {
     console.error('❌ Database connection error:', error.message);
-    // Fallback to JSON storage if MongoDB fails
-    console.log('⚠️  Falling back to JSON file storage');
+    console.log('💡 Make sure MONGODB_URI is set in your environment variables');
   }
 };
 
@@ -75,7 +70,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ 
     success: false, 
     message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+    error: err.message
   });
 });
 

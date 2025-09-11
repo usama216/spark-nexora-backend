@@ -1,7 +1,5 @@
-// Use MongoDB in production, JSON file in development
-const Contact = process.env.NODE_ENV === 'production' 
-  ? require('../models/Contact') 
-  : require('../models/ContactJSON');
+// Always use MongoDB for simplicity
+const Contact = require('../models/Contact');
 
 // Get dashboard statistics
 const getDashboardStats = async (req, res) => {
@@ -92,7 +90,7 @@ const getDashboardStats = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch dashboard statistics',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 };
@@ -115,7 +113,7 @@ const getRecentContacts = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch recent contacts',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 };
@@ -213,7 +211,7 @@ const getContactAnalytics = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch analytics',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 };
@@ -252,7 +250,7 @@ const bulkUpdateStatus = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to bulk update contacts',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 };
@@ -312,7 +310,7 @@ const exportContacts = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to export contacts',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 };

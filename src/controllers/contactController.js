@@ -1,7 +1,5 @@
-// Use MongoDB in production, JSON file in development
-const Contact = process.env.NODE_ENV === 'production' 
-  ? require('../models/Contact') 
-  : require('../models/ContactJSON');
+// Always use MongoDB for simplicity
+const Contact = require('../models/Contact');
 
 // Create new contact message
 const createContact = async (req, res) => {
@@ -55,7 +53,7 @@ const createContact = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to send message. Please try again.',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 };
@@ -94,39 +92,13 @@ const getAllContacts = async (req, res) => {
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    let contacts;
-    let total;
-
-    if (process.env.NODE_ENV === 'production') {
-      // MongoDB implementation
-      contacts = await Contact.find(filter)
-        .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
-        .skip(skip)
-        .limit(parseInt(limit));
-      
-      total = await Contact.countDocuments(filter);
-    } else {
-      // JSON file implementation
-      contacts = Contact.find(filter);
-      
-      // Apply sorting
-      contacts.sort((a, b) => {
-        const aVal = a[sortBy];
-        const bVal = b[sortBy];
-        if (sortOrder === 'desc') {
-          return bVal > aVal ? 1 : -1;
-        } else {
-          return aVal > bVal ? 1 : -1;
-        }
-      });
-      
-      // Apply pagination
-      const startIndex = skip;
-      const endIndex = skip + parseInt(limit);
-      contacts = contacts.slice(startIndex, endIndex);
-
-      total = Contact.countDocuments(filter);
-    }
+    // Simple MongoDB implementation
+    const contacts = await Contact.find(filter)
+      .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+    
+    const total = await Contact.countDocuments(filter);
 
     const totalPages = Math.ceil(total / parseInt(limit));
 
@@ -148,7 +120,7 @@ const getAllContacts = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch contacts',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 };
@@ -157,9 +129,7 @@ const getAllContacts = async (req, res) => {
 const getContactById = async (req, res) => {
   try {
     const { id } = req.params;
-    const contact = process.env.NODE_ENV === 'production' 
-      ? await Contact.findById(id)
-      : Contact.findById(id);
+    const contact = await Contact.findById(id);
 
     if (!contact) {
       return res.status(404).json({
@@ -177,7 +147,7 @@ const getContactById = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch contact',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 };
@@ -192,9 +162,7 @@ const updateContactStatus = async (req, res) => {
     if (status) updateData.status = status;
     if (priority) updateData.priority = priority;
 
-    const contact = process.env.NODE_ENV === 'production' 
-      ? await Contact.findByIdAndUpdate(id, updateData, { new: true })
-      : Contact.findByIdAndUpdate(id, updateData);
+    const contact = await Contact.findByIdAndUpdate(id, updateData, { new: true });
 
     if (!contact) {
       return res.status(404).json({
@@ -213,7 +181,7 @@ const updateContactStatus = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to update contact',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 };
@@ -231,9 +199,7 @@ const addAdminNote = async (req, res) => {
       });
     }
 
-    const contact = process.env.NODE_ENV === 'production' 
-      ? await Contact.findById(id)
-      : Contact.findById(id);
+    const contact = await Contact.findById(id);
       
     if (!contact) {
       return res.status(404).json({
@@ -252,9 +218,7 @@ const addAdminNote = async (req, res) => {
       addedAt: new Date().toISOString()
     });
 
-    const updatedContact = process.env.NODE_ENV === 'production' 
-      ? await Contact.findByIdAndUpdate(id, { adminNotes: contact.adminNotes }, { new: true })
-      : Contact.findByIdAndUpdate(id, contact);
+    const updatedContact = await Contact.findByIdAndUpdate(id, { adminNotes: contact.adminNotes }, { new: true });
 
     if (!updatedContact) {
       return res.status(404).json({
@@ -273,7 +237,7 @@ const addAdminNote = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to add note',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 };
@@ -282,9 +246,7 @@ const addAdminNote = async (req, res) => {
 const deleteContact = async (req, res) => {
   try {
     const { id } = req.params;
-    const contact = process.env.NODE_ENV === 'production' 
-      ? await Contact.findByIdAndDelete(id)
-      : Contact.findByIdAndDelete(id);
+    const contact = await Contact.findByIdAndDelete(id);
 
     if (!contact) {
       return res.status(404).json({
@@ -302,7 +264,7 @@ const deleteContact = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to delete contact',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 };

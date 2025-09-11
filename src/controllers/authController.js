@@ -1,9 +1,7 @@
 const jwt = require('jsonwebtoken');
 
-// Use MongoDB in production, JSON file in development
-const User = process.env.NODE_ENV === 'production' 
-  ? require('../models/User') 
-  : require('../models/UserJSON');
+// Always use MongoDB for simplicity
+const User = require('../models/User');
 
 // Generate JWT Token
 const generateToken = (userId) => {
@@ -26,9 +24,7 @@ const login = async (req, res) => {
     }
 
     // Find user by email
-    const user = process.env.NODE_ENV === 'production' 
-      ? await User.findOne({ email: email.toLowerCase() })
-      : User.findByEmail(email.toLowerCase());
+    const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
       return res.status(401).json({
@@ -54,26 +50,11 @@ const login = async (req, res) => {
     }
 
     // Compare password
-    const isPasswordValid = process.env.NODE_ENV === 'production' 
-      ? await user.comparePassword(password)
-      : await User.comparePassword(password, user.password);
+    const isPasswordValid = await user.comparePassword(password);
 
     if (!isPasswordValid) {
       // Increment login attempts
-      if (process.env.NODE_ENV === 'production') {
-        await user.incLoginAttempts();
-      } else {
-        // For JSON storage, we'll handle this differently
-        const users = User.getAll();
-        const userIndex = users.findIndex(u => u._id === user._id);
-        if (userIndex !== -1) {
-          users[userIndex].loginAttempts = (users[userIndex].loginAttempts || 0) + 1;
-          if (users[userIndex].loginAttempts >= 5) {
-            users[userIndex].lockUntil = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
-          }
-          User.saveAll(users);
-        }
-      }
+      await user.incLoginAttempts();
 
       return res.status(401).json({
         success: false,
@@ -82,19 +63,7 @@ const login = async (req, res) => {
     }
 
     // Reset login attempts on successful login
-    if (process.env.NODE_ENV === 'production') {
-      await user.resetLoginAttempts();
-    } else {
-      // For JSON storage
-      const users = User.getAll();
-      const userIndex = users.findIndex(u => u._id === user._id);
-      if (userIndex !== -1) {
-        users[userIndex].loginAttempts = 0;
-        users[userIndex].lockUntil = null;
-        users[userIndex].lastLogin = new Date().toISOString();
-        User.saveAll(users);
-      }
-    }
+    await user.resetLoginAttempts();
 
     // Generate JWT token
     const token = generateToken(user._id);
@@ -122,7 +91,7 @@ const login = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Login failed. Please try again.',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 };
@@ -143,9 +112,7 @@ const verifyToken = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // Find user by ID
-    const user = process.env.NODE_ENV === 'production' 
-      ? await User.findById(decoded.userId)
-      : User.findById(decoded.userId);
+    const user = await User.findById(decoded.userId);
 
     if (!user) {
       return res.status(401).json({
@@ -198,7 +165,7 @@ const verifyToken = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Token verification failed',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 };

@@ -1,9 +1,7 @@
 const jwt = require('jsonwebtoken');
 
-// Use MongoDB in production, JSON file in development
-const User = process.env.NODE_ENV === 'production' 
-  ? require('../models/User') 
-  : require('../models/UserJSON');
+// Always use MongoDB for simplicity
+const User = require('../models/User');
 
 // Authentication middleware
 const authenticate = async (req, res, next) => {
@@ -21,9 +19,7 @@ const authenticate = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // Find user by ID
-    const user = process.env.NODE_ENV === 'production' 
-      ? await User.findById(decoded.userId)
-      : User.findById(decoded.userId);
+    const user = await User.findById(decoded.userId);
 
     if (!user) {
       return res.status(401).json({
@@ -68,7 +64,7 @@ const authenticate = async (req, res, next) => {
     res.status(500).json({
       success: false,
       message: 'Authentication failed',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      error: error.message
     });
   }
 };
@@ -92,9 +88,7 @@ const optionalAuth = async (req, res, next) => {
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       
-      const user = process.env.NODE_ENV === 'production' 
-        ? await User.findById(decoded.userId)
-        : User.findById(decoded.userId);
+      const user = await User.findById(decoded.userId);
 
       if (user && user.isActive) {
         req.user = {
