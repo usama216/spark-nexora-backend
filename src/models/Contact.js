@@ -24,56 +24,56 @@ const contactSchema = new mongoose.Schema({
     trim: true,
     maxlength: [100, 'Company name cannot exceed 100 characters']
   },
-  subject: {
-    type: String,
-    required: [true, 'Subject is required'],
-    trim: true,
-    maxlength: [200, 'Subject cannot exceed 200 characters']
-  },
+  // subject: {
+  //   type: String,
+  //   required: [true, 'Subject is required'],
+  //   trim: true,
+  //   maxlength: [200, 'Subject cannot exceed 200 characters']
+  // },
   message: {
     type: String,
     required: [true, 'Message is required'],
     trim: true,
     maxlength: [2000, 'Message cannot exceed 2000 characters']
   },
-  service: {
-    type: String,
-    enum: [
-      'Digital Marketing',
-      'Web Design',
-      'SEO Services',
-      'Social Media Marketing',
-      'Content Marketing',
-      'Brand Development',
-      'PPC Advertising',
-      'Other'
-    ],
-    default: 'Other'
-  },
-  budget: {
-    type: String,
-    enum: [
-      'Under $5,000',
-      '$5,000 - $10,000',
-      '$10,000 - $25,000',
-      '$25,000 - $50,000',
-      'Over $50,000',
-      'Not sure'
-    ],
-    default: 'Not sure'
-  },
-  timeline: {
-    type: String,
-    enum: [
-      'ASAP',
-      'Within 1 month',
-      '1-3 months',
-      '3-6 months',
-      '6+ months',
-      'Just exploring'
-    ],
-    default: 'Just exploring'
-  },
+  // service: {
+  //   type: String,
+  //   enum: [
+  //     'Digital Marketing',
+  //     'Web Design',
+  //     'SEO Services',
+  //     'Social Media Marketing',
+  //     'Content Marketing',
+  //     'Brand Development',
+  //     'PPC Advertising',
+  //     'Other'
+  //   ],
+  //   default: 'Other'
+  // },
+  // budget: {
+  //   type: String,
+  //   enum: [
+  //     'Under $5,000',
+  //     '$5,000 - $10,000',
+  //     '$10,000 - $25,000',
+  //     '$25,000 - $50,000',
+  //     'Over $50,000',
+  //     'Not sure'
+  //   ],
+  //   default: 'Not sure'
+  // },
+  // timeline: {
+  //   type: String,
+  //   enum: [
+  //     'ASAP',
+  //     'Within 1 month',
+  //     '1-3 months',
+  //     '3-6 months',
+  //     '6+ months',
+  //     'Just exploring'
+  //   ],
+  //   default: 'Just exploring'
+  // },
   status: {
     type: String,
     enum: ['new', 'read', 'replied', 'closed'],
