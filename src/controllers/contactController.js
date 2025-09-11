@@ -1,4 +1,7 @@
-const Contact = require('../models/ContactJSON');
+// Use MongoDB in production, JSON file in development
+const Contact = process.env.NODE_ENV === 'production' 
+  ? require('../models/Contact') 
+  : require('../models/ContactJSON');
 
 // Create new contact message
 const createContact = async (req, res) => {
@@ -39,7 +42,7 @@ const createContact = async (req, res) => {
       success: true,
       message: 'Thank you for your message! We will get back to you within 24 hours.',
       data: {
-        id: contact._id,
+        id: contact._id || contact.id,
         name: contact.name,
         email: contact.email,
         subject: contact.subject,
@@ -91,25 +94,40 @@ const getAllContacts = async (req, res) => {
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    let contacts = Contact.find(filter);
-    
-    // Apply sorting
-    contacts.sort((a, b) => {
-      const aVal = a[sortBy];
-      const bVal = b[sortBy];
-      if (sortOrder === 'desc') {
-        return bVal > aVal ? 1 : -1;
-      } else {
-        return aVal > bVal ? 1 : -1;
-      }
-    });
-    
-    // Apply pagination
-    const startIndex = skip;
-    const endIndex = skip + parseInt(limit);
-    contacts = contacts.slice(startIndex, endIndex);
+    let contacts;
+    let total;
 
-    const total = await Contact.countDocuments(filter);
+    if (process.env.NODE_ENV === 'production') {
+      // MongoDB implementation
+      contacts = await Contact.find(filter)
+        .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
+        .skip(skip)
+        .limit(parseInt(limit));
+      
+      total = await Contact.countDocuments(filter);
+    } else {
+      // JSON file implementation
+      contacts = Contact.find(filter);
+      
+      // Apply sorting
+      contacts.sort((a, b) => {
+        const aVal = a[sortBy];
+        const bVal = b[sortBy];
+        if (sortOrder === 'desc') {
+          return bVal > aVal ? 1 : -1;
+        } else {
+          return aVal > bVal ? 1 : -1;
+        }
+      });
+      
+      // Apply pagination
+      const startIndex = skip;
+      const endIndex = skip + parseInt(limit);
+      contacts = contacts.slice(startIndex, endIndex);
+
+      total = Contact.countDocuments(filter);
+    }
+
     const totalPages = Math.ceil(total / parseInt(limit));
 
     res.json({
@@ -139,7 +157,9 @@ const getAllContacts = async (req, res) => {
 const getContactById = async (req, res) => {
   try {
     const { id } = req.params;
-    const contact = Contact.findById(id);
+    const contact = process.env.NODE_ENV === 'production' 
+      ? await Contact.findById(id)
+      : Contact.findById(id);
 
     if (!contact) {
       return res.status(404).json({
@@ -172,7 +192,9 @@ const updateContactStatus = async (req, res) => {
     if (status) updateData.status = status;
     if (priority) updateData.priority = priority;
 
-    const contact = Contact.findByIdAndUpdate(id, updateData);
+    const contact = process.env.NODE_ENV === 'production' 
+      ? await Contact.findByIdAndUpdate(id, updateData, { new: true })
+      : Contact.findByIdAndUpdate(id, updateData);
 
     if (!contact) {
       return res.status(404).json({
@@ -209,7 +231,10 @@ const addAdminNote = async (req, res) => {
       });
     }
 
-    const contact = Contact.findById(id);
+    const contact = process.env.NODE_ENV === 'production' 
+      ? await Contact.findById(id)
+      : Contact.findById(id);
+      
     if (!contact) {
       return res.status(404).json({
         success: false,
@@ -227,9 +252,11 @@ const addAdminNote = async (req, res) => {
       addedAt: new Date().toISOString()
     });
 
-    const updatedContact = Contact.findByIdAndUpdate(id, contact);
+    const updatedContact = process.env.NODE_ENV === 'production' 
+      ? await Contact.findByIdAndUpdate(id, { adminNotes: contact.adminNotes }, { new: true })
+      : Contact.findByIdAndUpdate(id, contact);
 
-    if (!contact) {
+    if (!updatedContact) {
       return res.status(404).json({
         success: false,
         message: 'Contact not found'
@@ -239,7 +266,7 @@ const addAdminNote = async (req, res) => {
     res.json({
       success: true,
       message: 'Note added successfully',
-      data: contact
+      data: updatedContact
     });
   } catch (error) {
     console.error('Error adding note:', error);
@@ -255,7 +282,9 @@ const addAdminNote = async (req, res) => {
 const deleteContact = async (req, res) => {
   try {
     const { id } = req.params;
-    const contact = Contact.findByIdAndDelete(id);
+    const contact = process.env.NODE_ENV === 'production' 
+      ? await Contact.findByIdAndDelete(id)
+      : Contact.findByIdAndDelete(id);
 
     if (!contact) {
       return res.status(404).json({

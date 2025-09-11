@@ -1,0 +1,15 @@
+[
+  {
+    "_id": "1",
+    "email": "usamajawad125@gmail.com",
+    "password": "$2a$12$jEKKqrZO.xxpzwU5xP9HX.R0HF.O.KVbyQE0Th00Prti5nPaRQXc.",
+    "name": "Admin User",
+    "role": "admin",
+    "isActive": true,
+    "lastLogin": "2025-09-11T20:06:35.994Z",
+    "loginAttempts": 0,
+    "lockUntil": null,
+    "createdAt": "2025-09-11T19:46:15.646Z",
+    "updatedAt": "2025-09-11T19:46:15.646Z"
+  }
+]

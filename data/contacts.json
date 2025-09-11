@@ -13,8 +13,8 @@
     "ipAddress": "::1",
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
     "createdAt": "2025-09-11T06:57:55.608Z",
-    "updatedAt": "2025-09-11T07:06:52.294Z",
-    "status": "replied"
+    "updatedAt": "2025-09-11T20:06:59.461Z",
+    "status": "new"
   },
   {
     "_id": "1757573899248",
@@ -30,7 +30,7 @@
     "ipAddress": "::1",
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
     "createdAt": "2025-09-11T06:58:19.248Z",
-    "updatedAt": "2025-09-11T06:59:24.399Z",
-    "status": "closed"
+    "updatedAt": "2025-09-11T20:06:48.750Z",
+    "status": "new"
   }
 ]

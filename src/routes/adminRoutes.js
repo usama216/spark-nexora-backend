@@ -6,8 +6,13 @@ const {
   bulkUpdateStatus,
   exportContacts
 } = require('../controllers/adminController');
+const { authenticate, authorizeAdmin } = require('../middleware/auth');
 
 const router = express.Router();
+
+// Apply authentication and admin authorization to all admin routes
+router.use(authenticate);
+router.use(authorizeAdmin);
 
 // GET /api/admin/dashboard - Get dashboard statistics
 router.get('/dashboard', getDashboardStats);

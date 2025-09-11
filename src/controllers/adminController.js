@@ -1,4 +1,7 @@
-const Contact = require('../models/ContactJSON');
+// Use MongoDB in production, JSON file in development
+const Contact = process.env.NODE_ENV === 'production' 
+  ? require('../models/Contact') 
+  : require('../models/ContactJSON');
 
 // Get dashboard statistics
 const getDashboardStats = async (req, res) => {

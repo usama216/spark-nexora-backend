@@ -1,44 +1,62 @@
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
 require('dotenv').config({ path: './config.env' });
 
 const contactRoutes = require('./routes/contactRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware - Allow CORS for all routes and origins
+// Database connection
+const connectDB = async () => {
+  try {
+    if (process.env.NODE_ENV === 'production' && process.env.MONGODB_URI) {
+      await mongoose.connect(process.env.MONGODB_URI);
+      console.log('✅ MongoDB connected successfully');
+    } else {
+      console.log('✅ Using JSON file storage for development');
+    }
+  } catch (error) {
+    console.error('❌ Database connection error:', error.message);
+    // Fallback to JSON storage if MongoDB fails
+    console.log('⚠️  Falling back to JSON file storage');
+  }
+};
+
+// Connect to database
+connectDB();
+
+// Middleware - Completely unrestricted CORS
 app.use(cors({
-  origin: true, // Allow all origins
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-  optionsSuccessStatus: 200 // For legacy browser support
+  origin: '*', // Allow ALL origins without any restrictions
+  credentials: false, // Set to false when using wildcard origin
+  methods: '*', // Allow ALL HTTP methods
+  allowedHeaders: '*', // Allow ALL headers
+  exposedHeaders: '*', // Expose ALL headers
+  optionsSuccessStatus: 200
 }));
 
-// Add CORS debugging middleware
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path} - Origin: ${req.get('Origin') || 'No origin'}`);
-  next();
-});
+// No restrictions - API is completely open
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Database connection (using JSON file storage for now)
-console.log('✅ Using JSON file storage for development');
 
-// Handle preflight requests
+// Handle preflight requests - Completely unrestricted
 app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  res.header('Access-Control-Expose-Headers', '*');
+  res.header('Access-Control-Max-Age', '86400'); // Cache preflight for 24 hours
   res.sendStatus(200);
 });
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
 
