@@ -5,7 +5,19 @@ require('dotenv').config({ path: '../config.env' });
 const addDefaultUser = async () => {
   try {
     console.log('🔌 Connecting to MongoDB...');
-    await mongoose.connect(process.env.MONGODB_URI);
+    
+    // Configure mongoose for better connection handling
+    mongoose.set('strictQuery', false);
+    
+    const options = {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      bufferMaxEntries: 0,
+      bufferCommands: false,
+    };
+    
+    await mongoose.connect(process.env.MONGODB_URI, options);
     console.log('✅ Connected to MongoDB');
 
     // Check if user already exists

@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 // Always use MongoDB for simplicity
 const Contact = require('../models/Contact');
 
@@ -61,6 +63,14 @@ const createContact = async (req, res) => {
 // Get all contacts with filtering and pagination
 const getAllContacts = async (req, res) => {
   try {
+    // Check database connection
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database connection not available. Please try again later.'
+      });
+    }
+
     const {
       page = 1,
       limit = 10,

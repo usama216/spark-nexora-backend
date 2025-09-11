@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 // Always use MongoDB for simplicity
 const User = require('../models/User');
@@ -20,6 +21,14 @@ const login = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Email and password are required'
+      });
+    }
+
+    // Check database connection
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database connection not available. Please try again later.'
       });
     }
 

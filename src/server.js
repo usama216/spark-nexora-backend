@@ -13,11 +13,37 @@ const PORT = process.env.PORT || 5000;
 // Database connection - Always use MongoDB for simplicity
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    // Configure mongoose for better connection handling
+    mongoose.set('strictQuery', false);
+    
+    const options = {
+      maxPoolSize: 10, // Maintain up to 10 socket connections
+      serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+      bufferMaxEntries: 0, // Disable mongoose buffering
+      bufferCommands: false, // Disable mongoose buffering
+    };
+
+    await mongoose.connect(process.env.MONGODB_URI, options);
     console.log('✅ MongoDB connected successfully');
+    
+    // Handle connection events
+    mongoose.connection.on('error', (err) => {
+      console.error('❌ MongoDB connection error:', err);
+    });
+    
+    mongoose.connection.on('disconnected', () => {
+      console.log('⚠️ MongoDB disconnected');
+    });
+    
+    mongoose.connection.on('reconnected', () => {
+      console.log('✅ MongoDB reconnected');
+    });
+    
   } catch (error) {
     console.error('❌ Database connection error:', error.message);
     console.log('💡 Make sure MONGODB_URI is set in your environment variables');
+    console.log('💡 MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
   }
 };
 
@@ -56,12 +82,25 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
-    message: 'Spark Nexora Backend API is running',
-    timestamp: new Date().toISOString()
-  });
+app.get('/api/health', async (req, res) => {
+  try {
+    // Check database connection
+    const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+    
+    res.status(200).json({ 
+      status: 'OK', 
+      message: 'Spark Nexora Backend API is running',
+      database: dbStatus,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'ERROR',
+      message: 'Health check failed',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // Error handling middleware
