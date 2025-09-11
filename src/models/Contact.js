@@ -1,108 +1,32 @@
 const mongoose = require('mongoose');
 
 const contactSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Name is required'],
-    trim: true,
-    maxlength: [100, 'Name cannot exceed 100 characters']
-  },
-  email: {
-    type: String,
-    required: [true, 'Email is required'],
-    trim: true,
-    lowercase: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
-  },
-  phone: {
-    type: String,
-    trim: true,
-    maxlength: [20, 'Phone number cannot exceed 20 characters']
-  },
-  company: {
-    type: String,
-    trim: true,
-    maxlength: [100, 'Company name cannot exceed 100 characters']
-  },
-  // subject: {
-  //   type: String,
-  //   required: [true, 'Subject is required'],
-  //   trim: true,
-  //   maxlength: [200, 'Subject cannot exceed 200 characters']
-  // },
-  message: {
-    type: String,
-    required: [true, 'Message is required'],
-    trim: true,
-    maxlength: [2000, 'Message cannot exceed 2000 characters']
-  },
-  // service: {
-  //   type: String,
-  //   enum: [
-  //     'Digital Marketing',
-  //     'Web Design',
-  //     'SEO Services',
-  //     'Social Media Marketing',
-  //     'Content Marketing',
-  //     'Brand Development',
-  //     'PPC Advertising',
-  //     'Other'
-  //   ],
-  //   default: 'Other'
-  // },
-  // budget: {
-  //   type: String,
-  //   enum: [
-  //     'Under $5,000',
-  //     '$5,000 - $10,000',
-  //     '$10,000 - $25,000',
-  //     '$25,000 - $50,000',
-  //     'Over $50,000',
-  //     'Not sure'
-  //   ],
-  //   default: 'Not sure'
-  // },
-  // timeline: {
-  //   type: String,
-  //   enum: [
-  //     'ASAP',
-  //     'Within 1 month',
-  //     '1-3 months',
-  //     '3-6 months',
-  //     '6+ months',
-  //     'Just exploring'
-  //   ],
-  //   default: 'Just exploring'
-  // },
+  // All fields are completely optional and unrestricted
+  name: String,
+  email: String,
+  phone: String,
+  company: String,
+  subject: String,
+  message: String,
+  service: String,
+  budget: String,
+  timeline: String,
   status: {
     type: String,
-    enum: ['new', 'read', 'replied', 'closed'],
     default: 'new'
   },
   priority: {
     type: String,
-    enum: ['low', 'medium', 'high', 'urgent'],
     default: 'medium'
   },
   source: {
     type: String,
-    default: 'website',
-    enum: ['website', 'phone', 'email', 'referral', 'social']
+    default: 'website'
   },
-  ipAddress: {
-    type: String,
-    trim: true
-  },
-  userAgent: {
-    type: String,
-    trim: true
-  },
+  ipAddress: String,
+  userAgent: String,
   adminNotes: [{
-    note: {
-      type: String,
-      required: true,
-      trim: true
-    },
+    note: String,
     addedBy: {
       type: String,
       default: 'System'
@@ -112,13 +36,8 @@ const contactSchema = new mongoose.Schema({
       default: Date.now
     }
   }],
-  lastContacted: {
-    type: Date
-  },
-  tags: [{
-    type: String,
-    trim: true
-  }]
+  lastContacted: Date,
+  tags: [String]
 }, {
   timestamps: true,
   toJSON: { virtuals: true },
@@ -142,17 +61,6 @@ contactSchema.virtual('formattedDate').get(function() {
   });
 });
 
-// Pre-save middleware
-contactSchema.pre('save', function(next) {
-  // Auto-assign priority based on service and budget
-  if (this.budget === 'Over $50,000' || this.timeline === 'ASAP') {
-    this.priority = 'high';
-  } else if (this.budget === '$25,000 - $50,000' || this.timeline === 'Within 1 month') {
-    this.priority = 'medium';
-  } else {
-    this.priority = 'low';
-  }
-  next();
-});
+// No validation middleware - completely unrestricted
 
 module.exports = mongoose.model('Contact', contactSchema);
