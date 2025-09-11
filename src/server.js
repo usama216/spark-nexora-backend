@@ -16,12 +16,14 @@ const connectDB = async () => {
     // Configure mongoose for better connection handling
     mongoose.set('strictQuery', false);
     
+    console.log('🔌 Attempting to connect to MongoDB...');
+    console.log('📍 MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
+    
     const options = {
       maxPoolSize: 10, // Maintain up to 10 socket connections
-      serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+      serverSelectionTimeoutMS: 10000, // Keep trying to send operations for 10 seconds
       socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-      bufferMaxEntries: 0, // Disable mongoose buffering
-      bufferCommands: false, // Disable mongoose buffering
+      connectTimeoutMS: 10000, // Give up initial connection after 10 seconds
     };
 
     await mongoose.connect(process.env.MONGODB_URI, options);
@@ -29,7 +31,7 @@ const connectDB = async () => {
     
     // Handle connection events
     mongoose.connection.on('error', (err) => {
-      console.error('❌ MongoDB connection error:', err);
+      console.error('❌ MongoDB connection error:', err.message);
     });
     
     mongoose.connection.on('disconnected', () => {
@@ -41,9 +43,10 @@ const connectDB = async () => {
     });
     
   } catch (error) {
-    console.error('❌ Database connection error:', error.message);
-    console.log('💡 Make sure MONGODB_URI is set in your environment variables');
-    console.log('💡 MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
+    console.error('❌ Database connection failed:', error.message);
+    console.log('💡 Make sure MONGODB_URI is set correctly in your environment variables');
+    console.log('💡 Check if your MongoDB Atlas cluster is accessible');
+    console.log('💡 Verify your network connection and firewall settings');
   }
 };
 

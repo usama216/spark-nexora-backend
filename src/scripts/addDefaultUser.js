@@ -1,20 +1,20 @@
 const mongoose = require('mongoose');
 const User = require('../models/User');
-require('dotenv').config({ path: '../config.env' });
+require('dotenv').config({ path: './config.env' });
 
 const addDefaultUser = async () => {
   try {
     console.log('🔌 Connecting to MongoDB...');
+    console.log('📍 MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
     
     // Configure mongoose for better connection handling
     mongoose.set('strictQuery', false);
     
     const options = {
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
-      bufferMaxEntries: 0,
-      bufferCommands: false,
+      connectTimeoutMS: 10000,
     };
     
     await mongoose.connect(process.env.MONGODB_URI, options);
