@@ -90,7 +90,7 @@ Development: http://localhost:5000/api/auth
 
 ### 2. Verify Token
 
-**Endpoint:** `POST /api/auth/verify`
+**Endpoint:** `GET /api/auth/verify` or `POST /api/auth/verify`
 
 **Description:** Verifies if the provided JWT token is valid and returns user information.
 
@@ -396,7 +396,11 @@ curl -X POST https://spark-nexora-backend.vercel.app/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"usamajawad125@gmail.com","password":"Spark@123"}'
 
-# Verify Token
+# Verify Token (GET method)
+curl -X GET https://spark-nexora-backend.vercel.app/api/auth/verify \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
+
+# Verify Token (POST method - alternative)
 curl -X POST https://spark-nexora-backend.vercel.app/api/auth/verify \
   -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
   -H "Content-Type: application/json"

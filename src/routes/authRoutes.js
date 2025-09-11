@@ -9,6 +9,9 @@ router.post('/login', login);
 // POST /api/auth/verify - Verify JWT token
 router.post('/verify', verifyToken);
 
+// GET /api/auth/verify - Verify JWT token (alternative endpoint)
+router.get('/verify', verifyToken);
+
 // POST /api/auth/logout - User logout
 router.post('/logout', logout);
 
