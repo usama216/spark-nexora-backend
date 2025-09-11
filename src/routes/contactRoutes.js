@@ -1,11 +1,10 @@
 const express = require('express');
 const { createContact, getAllContacts, getContactById, updateContactStatus, deleteContact, addAdminNote } = require('../controllers/contactController');
-const { validateContact } = require('../middleware/validation');
 
 const router = express.Router();
 
-// POST /api/contact - Create new contact message
-router.post('/', validateContact, createContact);
+// POST /api/contact - Create new contact message (no validation)
+router.post('/', createContact);
 
 // GET /api/contact - Get all contacts (for admin dashboard)
 router.get('/', getAllContacts);
