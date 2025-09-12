@@ -21,7 +21,7 @@ const addDefaultUser = async () => {
     console.log('✅ Connected to MongoDB');
 
     // Check if user already exists
-    const existingUser = await User.findOne({ email: 'usamajawad125@gmail.com' });
+    const existingUser = await User.findOne({ email: 'sparknexorainfo@gmail.com' });
 
     if (existingUser) {
       console.log('✅ Default user already exists');
@@ -31,7 +31,7 @@ const addDefaultUser = async () => {
     } else {
       // Create default user
       const defaultUser = new User({
-        email: 'usamajawad125@gmail.com',
+        email: 'sparknexorainfo@gmail.com',
         password: 'Spark@123',
         name: 'Admin User',
         role: 'admin',
