@@ -28,6 +28,16 @@ const addDefaultUser = async () => {
       console.log('📧 Email:', existingUser.email);
       console.log('👤 Name:', existingUser.name);
       console.log('🔑 Role:', existingUser.role);
+      
+      // Update password to Spark@123
+      console.log('🔄 Updating password...');
+      existingUser.password = 'Spark@123'; // This will trigger the pre-save middleware to hash the password
+      await existingUser.save();
+      console.log('✅ Password updated successfully to: Spark@123');
+      
+      // Verify the password works
+      const isPasswordValid = await existingUser.comparePassword('Spark@123');
+      console.log('✅ Password verification test:', isPasswordValid ? 'PASSED' : 'FAILED');
     } else {
       // Create default user
       const defaultUser = new User({
