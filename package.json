@@ -9,16 +9,22 @@
     "update-admin": "node src/scripts/addDefaultUser.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["api", "contact", "management", "spark-nexora"],
+  "keywords": [
+    "api",
+    "contact",
+    "management",
+    "spark-nexora"
+  ],
   "author": "Spark Nexora Team",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "mongoose": "^8.0.3",
-    "bcryptjs": "^2.4.3",
+    "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
-    "nodemon": "^3.0.2"
+    "mongoose": "^8.0.3",
+    "nodemon": "^3.0.2",
+    "stripe": "^18.5.0"
   }
 }

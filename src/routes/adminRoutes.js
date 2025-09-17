@@ -4,7 +4,11 @@ const {
   getRecentContacts, 
   getContactAnalytics,
   bulkUpdateStatus,
-  exportContacts
+  exportContacts,
+  getAllPayments,
+  getPaymentStats,
+  getPaymentById,
+  updatePaymentStatus
 } = require('../controllers/adminController');
 const { authenticate, authorizeAdmin } = require('../middleware/auth');
 
@@ -28,5 +32,18 @@ router.put('/bulk-update', bulkUpdateStatus);
 
 // GET /api/admin/export - Export contacts
 router.get('/export', exportContacts);
+
+// Payment management routes
+// GET /api/admin/payments - Get all payments with pagination and filtering
+router.get('/payments', getAllPayments);
+
+// GET /api/admin/payments/stats - Get payment statistics
+router.get('/payments/stats', getPaymentStats);
+
+// GET /api/admin/payments/:id - Get single payment details
+router.get('/payments/:id', getPaymentById);
+
+// PUT /api/admin/payments/:id/status - Update payment status
+router.put('/payments/:id/status', updatePaymentStatus);
 
 module.exports = router;
